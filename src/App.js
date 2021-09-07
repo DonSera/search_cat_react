@@ -5,12 +5,18 @@ import {useEffect, useState} from "react";
 
 function App() {
     let timer;
+    let [loading, setLoading] = useState(true); // True가 로딩이 나오게
     let [inputValue, setInputValue] = useState("");
     let [mainString, setMainString] = useState("message");
 
     useEffect(() => {
         // 입력값이 바뀌면 setType 호출
-        setType();
+        setLoading(true);
+        setMainString(<LoadingSpinner/>);
+        setType().then(main => {
+            // 입력이 있을 시 main 내용 변경
+            setMainString(main);
+        });
     }, [inputValue])
 
     function debounce(ele) {
@@ -34,7 +40,6 @@ function App() {
                 // 아무것도 들어 오지 않은 경우
                 mainContent = "입력해 주세요";
             } else {
-                setMainString(<LoadingSpinner/>);
                 const jsonArray = await getJson(inputValue)
                 if (jsonArray.length === 0) {
                     // 결과가 0개인 경우
@@ -48,15 +53,15 @@ function App() {
             }
         } catch (e) {
             // 에러나는 경우
-            mainContent = 'Error'+e;
+            mainContent = 'Error' + e;
         }
 
-        if(checking) console.log("Get Array"); // 정상적 결과
+        if (checking) console.log("Get Array"); // 정상적 결과
         else console.log(mainContent);
 
+        setLoading(false);
         // setMainString(mainContent);
-
-        // return mainContent;
+        return mainContent;
     }
 
     async function getJson(input) {
@@ -89,18 +94,17 @@ function App() {
         );
     }
 
-
     return (
-        <div className="App">
-            <header className="App-header">
+        <div className={"App"}>
+            <header className={"App-header"}>
                 <main>
                     <div>
-                        <input className="input" type="text" id="inputType"
+                        <input className={"input"} type="text" id="inputType"
                                placeholder="고양이 종류를 입력해주세요."
-                            // value={inputValue}
                                onInput={debounce}/>
+                               {/*value={inputValue}/>*/}
                     </div>
-                    <div className="cat-div" id="catDiv">
+                    <div className={"cat-div"} id="catDiv">
                         {mainString}
                     </div>
                 </main>
@@ -108,6 +112,5 @@ function App() {
         </div>
     );
 }
-
 
 export default App;

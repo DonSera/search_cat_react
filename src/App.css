@@ -14,47 +14,7 @@ padding-top: 20px;
 }
 
 .cat-div {
-  padding: 30px;
-}
-
-.cat-card {
-  float: left;
-  padding: 5px;
-}
-.lazy{
-
-}
-.loading {
-  position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.text-loading{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.spinner-loading {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  border: 10px solid black;
-  border-top: 10px solid yellow;
-  border-radius: 50%;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  padding-top: 50px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
