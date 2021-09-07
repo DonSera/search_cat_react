@@ -9,8 +9,9 @@ function App() {
 
     useEffect(() => {
         // 입력값이 바뀌면 setType 호출 promise로 넘어 오기 때문에 이렇게 처리
-        setType().then(message => {
-            setMainString(message);
+        setType().then(main => {
+            // 입력이 있을 시 main 내용 변경
+            setMainString(main);
         });
     }, [inputValue])
 
@@ -26,28 +27,33 @@ function App() {
     }
 
     async function setType() {
-        // 결과에 해당하는 값을 main에 갈아 끼우기
-        let mainContent = 'error';
+        // main 결과에 해당하는 값 return
+        console.log("입력 문자 : " + inputValue);
+        let checking = false;
+        let mainContent = '';
         try {
             if (inputValue === "") {
                 // 아무것도 들어 오지 않은 경우
-                mainContent = "Get no word";
                 console.log(mainContent);
             } else {
-                console.log("입력 문자 : " + inputValue);
                 const jsonArray = await getJson(inputValue)
                 if (jsonArray.length === 0) {
-                    mainContent = "Non result";
+                    // 결과가 0개인 경우
                     console.log(mainContent);
                 } else {
-                    console.log("Get array")
+                    // 정상적인 결과
                     mainContent = addImges(jsonArray);
+                    checking = true;
                 }
             }
         } catch (e) {
-            console.log("Error" + e);
-            mainContent = 'Error';
+            // 에러나는 경우
+            mainContent = 'Error'+e;
         }
+
+        if(checking) console.log("Get Array"); // 정상적 결과
+        else console.log(mainContent);
+
         return mainContent;
     }
 
@@ -66,19 +72,19 @@ function App() {
 
     function addImges(jsonArray) {
         const imgUrlArray = [];
-        const catCardDiv = jsonArray.map((array, index) => {
+        return jsonArray.map((array, index) => {
                 const imgUrl = array.url;
                 const imgName = array.name;
                 const nameArray = imgName.split(' / ');
 
+                // 이전에 존재하는 경우 넘어가기
                 if (imgUrlArray.includes(imgUrl)) return <></>;
                 imgUrlArray.push(imgUrl);
 
-                console.log(index + "번째 : " + imgUrl);
+                // console.log(index + "번째 : " + imgUrl);
                 return <CatCard url={imgUrl} nameArray={nameArray}/>;
             }
-        )
-        return catCardDiv;
+        );
     }
 
 
