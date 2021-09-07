@@ -1,5 +1,6 @@
 import './App.css';
 import CatCard from "./component/CatCard";
+import LoadingSpinner from "./component/LoadingSpinner";
 import {useEffect, useState} from "react";
 
 function App() {
@@ -8,11 +9,8 @@ function App() {
     let [mainString, setMainString] = useState("message");
 
     useEffect(() => {
-        // 입력값이 바뀌면 setType 호출 promise로 넘어 오기 때문에 이렇게 처리
-        setType().then(main => {
-            // 입력이 있을 시 main 내용 변경
-            setMainString(main);
-        });
+        // 입력값이 바뀌면 setType 호출
+        setType();
     }, [inputValue])
 
     function debounce(ele) {
@@ -34,11 +32,13 @@ function App() {
         try {
             if (inputValue === "") {
                 // 아무것도 들어 오지 않은 경우
-                console.log(mainContent);
+                mainContent = "입력해 주세요";
             } else {
+                setMainString(<LoadingSpinner/>);
                 const jsonArray = await getJson(inputValue)
                 if (jsonArray.length === 0) {
                     // 결과가 0개인 경우
+                    mainContent = "결과가 없습니다."
                     console.log(mainContent);
                 } else {
                     // 정상적인 결과
@@ -54,7 +54,9 @@ function App() {
         if(checking) console.log("Get Array"); // 정상적 결과
         else console.log(mainContent);
 
-        return mainContent;
+        // setMainString(mainContent);
+
+        // return mainContent;
     }
 
     async function getJson(input) {
