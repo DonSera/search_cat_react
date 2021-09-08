@@ -35,7 +35,7 @@ function LoadingSpinner() {
                         attributeName="transform"
                         type="rotate"
                         from="0 60 60"
-                        to="-360 60 60"
+                        to="360 60 60"
                         dur="1s"
                         repeatCount="indefinite"
                     />
