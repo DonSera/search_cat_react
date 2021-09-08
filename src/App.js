@@ -8,15 +8,12 @@ function App() {
     let [loading, setLoading] = useState(true); // True가 로딩이 나오게
     let [inputValue, setInputValue] = useState("");
     let [mainString, setMainString] = useState("message");
+    let [catCard, setCatCard] = useState([]);
 
     useEffect(() => {
         // 입력값이 바뀌면 setType 호출
         setLoading(true);
-        setMainString(<LoadingSpinner/>);
-        setType().then(main => {
-            // 입력이 있을 시 main 내용 변경
-            setMainString(main);
-        });
+        setType();
     }, [inputValue])
 
     function debounce(ele) {
@@ -34,11 +31,12 @@ function App() {
         // main 결과에 해당하는 값 return
         console.log("입력 문자 : " + inputValue);
         let checking = false;
-        let mainContent = '';
+        let mainContent = 0;
+        setCatCard([]);
         try {
             if (inputValue === "") {
                 // 아무것도 들어 오지 않은 경우
-                mainContent = "입력해 주세요";
+                mainContent = "입력해 주세요.";
             } else {
                 const jsonArray = await getJson(inputValue)
                 if (jsonArray.length === 0) {
@@ -47,21 +45,19 @@ function App() {
                     console.log(mainContent);
                 } else {
                     // 정상적인 결과
-                    mainContent = addImges(jsonArray);
+                    addImges(jsonArray);
                     checking = true;
                 }
             }
         } catch (e) {
             // 에러나는 경우
-            mainContent = 'Error' + e;
+            mainContent = '에러' + e;
         }
 
         if (checking) console.log("Get Array"); // 정상적 결과
-        else console.log(mainContent);
+        else setMainString(mainContent);
 
         setLoading(false);
-        // setMainString(mainContent);
-        return mainContent;
     }
 
     async function getJson(input) {
@@ -79,17 +75,20 @@ function App() {
 
     function addImges(jsonArray) {
         const imgUrlArray = [];
-        return jsonArray.map((array, index) => {
+        jsonArray.map((array) => {
                 const imgUrl = array.url;
                 const imgName = array.name;
                 const nameArray = imgName.split(' / ');
 
                 // 이전에 존재하는 경우 넘어가기
-                if (imgUrlArray.includes(imgUrl)) return <></>;
-                imgUrlArray.push(imgUrl);
+                if (!imgUrlArray.includes(imgUrl)) {
+                    imgUrlArray.push(imgUrl);
 
-                // console.log(index + "번째 : " + imgUrl);
-                return <CatCard url={imgUrl} nameArray={nameArray}/>;
+                    // console.log(index + "번째 : " + imgUrl);
+                    const copyCatCard = catCard;
+                    copyCatCard.push({url: imgUrl, engName: nameArray[0], koName: nameArray[1]});
+                    setCatCard(copyCatCard);
+                }
             }
         );
     }
@@ -102,10 +101,15 @@ function App() {
                         <input className={"input"} type="text" id="inputType"
                                placeholder="고양이 종류를 입력해주세요."
                                onInput={debounce}/>
-                               {/*value={inputValue}/>*/}
+                        {/*value={inputValue}/>*/}
                     </div>
                     <div className={"cat-div"} id="catDiv">
-                        {mainString}
+                        {loading ? <LoadingSpinner/>
+                            : catCard.length ? catCard.map((obj) => {
+                                    return <CatCard url={obj.url} engName={obj.engName} koName={obj.koName}/>
+                                })
+                                : mainString
+                        }
                     </div>
                 </main>
             </header>
