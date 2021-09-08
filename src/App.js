@@ -4,7 +4,8 @@ import LoadingSpinner from "./component/LoadingSpinner";
 import {useEffect, useRef, useState} from "react";
 
 function App() {
-    const timer = useRef(null); // debounce를 위한 값
+    const timerValue = useRef(null); // debounce를 위한 값
+    const [timer, setTimer] = useState(null); // debounce 여부 확인
     const [loading, setLoading] = useState(false);    // True가 로딩이 나오게
     const [inputValue, setInputValue] = useState(""); // 입력값
     const [imgInfo, setImgInfo] = useState([]);       // 이미지 데이터
@@ -17,7 +18,6 @@ function App() {
         if (inputValue === "") {
             setErrorText(`입력해 주세요.`); // 에러 1번
         } else {
-            console.log(`입력 문자 :  ${inputValue}`);
             setLoading(true); // 로딩 시작
             getMessage()
                 .then(message => {
@@ -29,16 +29,17 @@ function App() {
                     setLoading(false);
                 });
         }
-    }, [inputValue])
+    }, [timer])
 
     function debounce(ele) {
+        setInputValue(ele.target.value);
         // 단어 단위로 검색정갱신
-        if (timer.current) {
-            clearTimeout(timer.current);
+        if (timerValue.current) {
+            clearTimeout(timerValue.current);
         }
-        timer.current = setTimeout(() => {
-            setInputValue(ele.target.value);
-        }, 500);
+        timerValue.current = setTimeout(() => {
+            setTimer(timerValue.current);
+        }, 700);
     }
 
     async function getMessage() {
@@ -66,7 +67,7 @@ function App() {
     function saveImgInfo(imgInfoArray) {
         // array에 담긴 이미지 정보 저장하기
         const checkOverlapUrlSet = new Set(); // 중복 확인용
-        const newImgInfoArray =  [];// 결과 넣을 공간
+        const newImgInfoArray = [];// 결과 넣을 공간
         imgInfoArray.map(obj => {
                 // 이전에 존재하는 경우 넘어가기
                 const imgUrl = obj.url;
@@ -101,8 +102,8 @@ function App() {
                     <div>
                         <input className={`input`} type={`text`} id={`inputType`}
                                placeholder={`고양이 종류를 입력해주세요.`}
-                               onChange={debounce}/>
-                        {/*value={inputValue}/>*/}
+                               onChange={debounce}
+                               value={inputValue}/>
                     </div>
                     <div className={`cat-div`} id={`catDiv`}>
                         {renderDiv()}
