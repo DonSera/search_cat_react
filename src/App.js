@@ -40,10 +40,10 @@ function App() {
                 pushArray = "입력해 주세요.";
             } else {
                 const jsonArray = await getJson(inputValue)
-                if(typeof  jsonArray === "undefined"){
-                    pushArray = "오류발생 다시 입력 바랍니다."
-                }
-                else if (jsonArray.length === 0) {
+                if (jsonArray.message) {
+                    // 결과가 undefined인 경우
+                    pushArray = jsonArray.message;
+                } else if (jsonArray.length === 0) {
                     // 결과가 0개인 경우
                     pushArray = "결과가 없습니다."
                 } else {
@@ -75,8 +75,11 @@ function App() {
             .then((resJson) => {
                 return resJson.data;
             })
-
         console.log("fetch end");
+
+        if (result === undefined) {
+            return {message: "다시 입력해 주세요"}
+        }
         return result;
     }
 
@@ -89,12 +92,13 @@ function App() {
                 const nameArray = imgName.split(' / ');
 
                 // 이전에 존재하는 경우 넘어가기
-                if (!imgUrlArray.includes(imgUrl)) {
-                    imgUrlArray.push(imgUrl);
-                    pushArray.push({url: imgUrl, engName: nameArray[0], koName: nameArray[1]});
-                }
+                if (imgUrlArray.includes(imgUrl)) return true;
+                imgUrlArray.push(imgUrl);
+                pushArray.push({url: imgUrl, engName: nameArray[0], koName: nameArray[1]});
+
             }
         );
+
         return pushArray;
     }
 
@@ -109,12 +113,15 @@ function App() {
                         {/*value={inputValue}/>*/}
                     </div>
                     <div className={"cat-div"} id="catDiv">
-                        {/*로딩 여부 ? 로딩 : 이미지 여부 ? 이미지 : 메세지*/}
+                        {/*로딩 여부 ? 로딩 : 메세지 여부 ? 메세지 : 이미지*/}
                         {
                             loading ? <LoadingSpinner/>
                                 : typeof catCard === "string" ? catCard
-                                    : catCard.map((obj) => {
-                                        return <CatCard url={obj.url} engName={obj.engName} koName={obj.koName}/>
+                                    : catCard.map((obj, index) => {
+                                        return <CatCard url={obj.url}
+                                                        engName={obj.engName}
+                                                        koName={obj.koName}
+                                                        lazy={false} index={index}/>;
                                     })
                         }
                     </div>
